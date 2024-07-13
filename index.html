@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Керування групами</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        #logo {
+            margin-bottom: 20px;
+            width: 560px;
+        }
+        #logo img {
+            max-width: 100%;
+            height: auto;
+        }
+        #groupSelector {
+            margin-bottom: 20px;
+        }
+        #controls {
+            display: none;
+            margin-bottom: 20px;
+        }
+        button {
+            margin: 0 10px;
+        }
+        #status {
+            margin-bottom: 20px;
+        }
+        #lightStatus {
+            margin-top: auto;
+            text-align: center;
+            width: 100%;
+        }
+        #lightStatusList {
+            list-style-type: none;
+            padding: 0;
+        }
+        #lightStatusList li {
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .groupInfo {
+            display: flex;
+            align-items: center;
+        }
+        .groupInfo input {
+            margin-left: 10px;
+            width: 200px;
+        }
+        h5 {
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div id="logo">
+        <img src="Dtek-logo.png" alt="Логотип">
+        <h5>Super Adminka Svitlo 2024</h5>
+    </div>
+    
+    <select id="groupSelector">
+        <option value="">Виберіть групу</option>
+        <option value="1">Група 1</option>
+        <option value="2">Група 2</option>
+        <option value="3">Група 3</option>
+        <option value="4">Група 4</option>
+        <option value="5">Група 5</option>
+        <option value="6">Група 6</option>
+    </select>
+    
+    <div id="controls">
+        <input type="number" id="percentInput" min="0" max="100" value="100">
+        <button id="turnOff">Вимкнути</button>
+        <button id="turnOn">Увімкнути</button>
+    </div>
+    
+    <div id="status"></div>
+
+    <div id="lightStatus">
+        <h3>Статус світла в групах:</h3>
+        <ul id="lightStatusList"></ul>
+    </div>
+
+    <script>
+        const groupSelector = document.getElementById('groupSelector');
+        const controls = document.getElementById('controls');
+        const percentInput = document.getElementById('percentInput');
+        const turnOffBtn = document.getElementById('turnOff');
+        const turnOnBtn = document.getElementById('turnOn');
+        const statusDiv = document.getElementById('status');
+        const lightStatusList = document.getElementById('lightStatusList');
+
+        const groups = {
+            1: { light: 100, info: '' },
+            2: { light: 100, info: '' },
+            3: { light: 100, info: '' },
+            4: { light: 100, info: '' },
+            5: { light: 100, info: '' },
+            6: { light: 100, info: '' }
+        };
+
+        
+        groupSelector.addEventListener('change', function() {
+            if (this.value) {
+                controls.style.display = 'block';
+                updateStatus();
+            } else {
+                controls.style.display = 'none';
+                statusDiv.textContent = '';
+            }
+        });
+
+        turnOffBtn.addEventListener('click', function() {
+            const group = groupSelector.value;
+            const percent = parseInt(percentInput.value);
+            if (group && !isNaN(percent)) {
+                groups[group].light = Math.max(0, groups[group].light - percent);
+                updateStatus();
+                updateLightStatus();
+            }
+        });
+
+        turnOnBtn.addEventListener('click', function() {
+            const group = groupSelector.value;
+            const percent = parseInt(percentInput.value);
+            if (group && !isNaN(percent)) {
+                groups[group].light = Math.min(100, groups[group].light + percent);
+                updateStatus();
+                updateLightStatus();
+            }
+        });
+
+        function updateStatus() {
+            const group = groupSelector.value;
+            if (group) {
+                statusDiv.textContent = `Група ${group}: ${groups[group].light}%`;
+            }
+        }
+
+        function updateLightStatus() {
+            lightStatusList.innerHTML = '';
+            for (let group in groups) {
+                const li = document.createElement('li');
+                
+                const statusSpan = document.createElement('span');
+                statusSpan.textContent = `Група ${group}: ${groups[group].light}% світла`;
+                
+                const groupInfo = document.createElement('div');
+                groupInfo.className = 'groupInfo';
+                
+                const infoSpan = document.createElement('span');
+                infoSpan.textContent = 'В цій групі знаходиться:';
+                
+                const infoInput = document.createElement('input');
+                infoInput.type = 'text';
+                infoInput.value = groups[group].info;
+                infoInput.addEventListener('input', function() {
+                    groups[group].info = this.value;
+                });
+                
+                groupInfo.appendChild(infoSpan);
+                groupInfo.appendChild(infoInput);
+                
+                li.appendChild(statusSpan);
+                li.appendChild(groupInfo);
+                
+                lightStatusList.appendChild(li);
+            }
+        }
+
+        // Початкове оновлення статусу світла
+        updateLightStatus();
+    </script>
+</body>
+</html>
